@@ -23,28 +23,17 @@ rem
 rem   BALLERINA_HOME  Home of BALLERINA installation. If not set I will  try
 rem                   to figure it out.
 rem
-rem   JAVA_HOME       Must point at your Java Development Kit installation.
+rem   BVM_HOME       Must point at your Java Development Kit installation.
 rem
 rem   JAVA_OPTS       (Optional) Java runtime options used when the commands
 rem                   is executed.
 rem ---------------------------------------------------------------------------
 
-rem ----- if JAVA_HOME is not set we're not happy ------------------------------
-
-:checkJava
-
-if "%JAVA_HOME%" == "" goto noJavaHome
-if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHome
-goto checkServer
-
-:noJavaHome
-echo "You must set the JAVA_HOME variable before running Ballerina."
-goto end
-
 rem ----- set BALLERINA_HOME ----------------------------
 :checkServer
 rem %~sdp0 is expanded pathname of the current script under NT with spaces in the path removed
 set BALLERINA_HOME=%~sdp0..
+set BVM_HOME=%BALLERINA_HOME%\bre\lib\jre1.8.0_172
 SET curDrive=%cd:~0,1%
 SET ballerinaDrive=%BALLERINA_HOME:~0,1%
 if not "%curDrive%" == "%ballerinaDrive%" %ballerinaDrive%:
@@ -62,7 +51,7 @@ setlocal EnableDelayedExpansion
 set BALLERINA_CLASSPATH=
 FOR %%C in ("%BALLERINA_HOME%\bre\lib\bootstrap\*.jar") DO set BALLERINA_CLASSPATH=!BALLERINA_CLASSPATH!;"%BALLERINA_HOME%\bre\lib\bootstrap\%%~nC%%~xC"
 
-set BALLERINA_CLASSPATH="%JAVA_HOME%\lib\tools.jar";%BALLERINA_CLASSPATH%;
+set BALLERINA_CLASSPATH="%BVM_HOME%\lib\tools.jar";%BALLERINA_CLASSPATH%;
 
 FOR %%D in ("%BALLERINA_HOME%\bre\lib\*.jar") DO set BALLERINA_CLASSPATH=!BALLERINA_CLASSPATH!;"%BALLERINA_HOME%\bre\lib\%%~nD%%~xD"
 
@@ -112,11 +101,11 @@ rem ---------- Add jars to classpath ----------------
 
 set BALLERINA_CLASSPATH=.\bre\lib\bootstrap;%BALLERINA_CLASSPATH%
 
-set CMD_LINE_ARGS=-Xbootclasspath/a:%BALLERINA_XBOOTCLASSPATH% -Xms256m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath="%BALLERINA_HOME%\heap-dump.hprof"  -Dcom.sun.management.jmxremote -classpath %BALLERINA_CLASSPATH% %JAVA_OPTS% -Dballerina.home="%BALLERINA_HOME%"  -Djava.command="%JAVA_HOME%\bin\java" -Djava.opts="%JAVA_OPTS%" -Denable.nonblocking=false -Dtransports.netty.conf="%BALLERINA_HOME%\bre\conf\netty-transports.yml" -Dfile.encoding=UTF8 -Dballerina.version=${project.version} -Djava.util.logging.config.file="%BALLERINA_HOME%\bre\conf\logging.properties" -Djava.util.logging.manager="org.ballerinalang.logging.BLogManager"
+set CMD_LINE_ARGS=-Xbootclasspath/a:%BALLERINA_XBOOTCLASSPATH% -Xms256m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath="%BALLERINA_HOME%\heap-dump.hprof"  -Dcom.sun.management.jmxremote -classpath %BALLERINA_CLASSPATH% %JAVA_OPTS% -Dballerina.home="%BALLERINA_HOME%"  -Djava.command="%BVM_HOME%\bin\java" -Djava.opts="%JAVA_OPTS%" -Denable.nonblocking=false -Dtransports.netty.conf="%BALLERINA_HOME%\bre\conf\netty-transports.yml" -Dfile.encoding=UTF8 -Dballerina.version=${project.version} -Djava.util.logging.config.file="%BALLERINA_HOME%\bre\conf\logging.properties" -Djava.util.logging.manager="org.ballerinalang.logging.BLogManager"
 
 
 :runJava
-"%JAVA_HOME%\bin\java" %CMD_LINE_ARGS% org.ballerinalang.launcher.Main %CMD%
+"%BVM_HOME%\bin\java" %CMD_LINE_ARGS% org.ballerinalang.launcher.Main %CMD%
 :end
 goto endlocal
 

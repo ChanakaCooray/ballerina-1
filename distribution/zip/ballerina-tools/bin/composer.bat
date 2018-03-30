@@ -23,29 +23,19 @@ rem
 rem   BAL_COMPOSER_HOME   Home of Ballerina composer installation. If not set
 rem                   I will try to figure it out.
 rem
-rem   JAVA_HOME       Must point at your Java Development Kit installation.
+rem   BVM_HOME       Must point at your Java Development Kit installation.
 rem
 rem   JAVA_OPTS       (Optional) Java runtime options used when the commands
 rem                   is executed.
 rem ---------------------------------------------------------------------------
 
-rem ----- if JAVA_HOME is not set we're not happy ------------------------------
-
 set BASE_DIR=%CD%
-:checkJava
-
-if "%JAVA_HOME%" == "" goto noJavaHome
-if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHome
-goto checkServer
-
-:noJavaHome
-echo "You must set the JAVA_HOME variable before running Ballerina."
-goto end
 
 rem ----- Only set BALLERINA_HOME if not already set ----------------------------
 :checkServer
 rem %~sdp0 is expanded pathname of the current script under NT with spaces in the path removed
 if "%BALLERINA_HOME%"=="" set BALLERINA_HOME=%~sdp0..
+set BVM_HOME=%BALLERINA_HOME%\bre\lib\jre1.8.0_172
 SET curDrive=%cd:~0,1%
 SET wsasDrive=%BALLERINA_HOME:~0,1%
 if not "%curDrive%" == "%wsasDrive%" %wsasDrive%:
@@ -68,7 +58,7 @@ cd %BALLERINA_HOME%
 set BALLERINA_CLASSPATH=
 FOR %%C in ("%BALLERINA_HOME%\bin\bootstrap\*.jar") DO set BALLERINA_CLASSPATH=!BALLERINA_CLASSPATH!;".\bin\bootstrap\%%~nC%%~xC"
 
-set BALLERINA_CLASSPATH="%JAVA_HOME%\lib\tools.jar";%BALLERINA_CLASSPATH%;
+set BALLERINA_CLASSPATH="%BVM_HOME%\lib\tools.jar";%BALLERINA_CLASSPATH%;
 
 rem ----- Process the input command -------------------------------------------
 
@@ -120,7 +110,7 @@ rem find the version of the jdk
 set CMD=%*
 
 :checkJdk16
-"%JAVA_HOME%\bin\java" -version 2>&1 | findstr /r "1.[8]" >NUL
+"%BVM_HOME%\bin\java" -version 2>&1 | findstr /r "1.[8]" >NUL
 IF ERRORLEVEL 1 goto unknownJdk
 goto jdk16
 
@@ -143,12 +133,12 @@ rem ---------- Add jars to classpath ----------------
 
 rem set BALLERINA_CLASSPATH=.\bin\bootstrap;%BALLERINA_CLASSPATH%
 
-set JAVA_ENDORSED=".\bin\bootstrap\endorsed";"%JAVA_HOME%\jre\lib\endorsed";"%JAVA_HOME%\lib\endorsed"
+set JAVA_ENDORSED=".\bin\bootstrap\endorsed";"%BVM_HOME%\jre\lib\endorsed";"%BVM_HOME%\lib\endorsed"
 
-set CMD_LINE_ARGS=-Xbootclasspath/a:%BALLERINA_XBOOTCLASSPATH% -Xms256m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath="%BALLERINA_HOME%\logs\heap-dump.hprof" -Djava.util.logging.config.file="%BALLERINA_HOME%\resources\composer\conf\composer-logging.properties" -Dcom.sun.management.jmxremote -classpath %BALLERINA_CLASSPATH% %JAVA_OPTS% -Djava.endorsed.dirs=%JAVA_ENDORSED%  -Dballerina.home="%BALLERINA_HOME%" -Dcomposer.config.path="%BALLERINA_HOME%\resources\composer\conf\composer-config.yml" -Dcomposer.public.path="%BALLERINA_HOME%\resources\composer\web\public" -Djava.command="%JAVA_HOME%\bin\java" -Djava.opts="%JAVA_OPTS%" -Dfile.encoding=UTF8 -Dcomposer.port=9091 -Dopen.browser=true -DenableCloud=false -Dworkspace.port=8289 -Dtransports.netty.conf=./resources/composer/services/netty-transports.yml -Dmsf4j.conf=./resources/composer/services/deployment.yaml
+set CMD_LINE_ARGS=-Xbootclasspath/a:%BALLERINA_XBOOTCLASSPATH% -Xms256m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath="%BALLERINA_HOME%\logs\heap-dump.hprof" -Djava.util.logging.config.file="%BALLERINA_HOME%\resources\composer\conf\composer-logging.properties" -Dcom.sun.management.jmxremote -classpath %BALLERINA_CLASSPATH% %JAVA_OPTS% -Djava.endorsed.dirs=%JAVA_ENDORSED%  -Dballerina.home="%BALLERINA_HOME%" -Dcomposer.config.path="%BALLERINA_HOME%\resources\composer\conf\composer-config.yml" -Dcomposer.public.path="%BALLERINA_HOME%\resources\composer\web\public" -Djava.command="%BVM_HOME%\bin\java" -Djava.opts="%JAVA_OPTS%" -Dfile.encoding=UTF8 -Dcomposer.port=9091 -Dopen.browser=true -DenableCloud=false -Dworkspace.port=8289 -Dtransports.netty.conf=./resources/composer/services/netty-transports.yml -Dmsf4j.conf=./resources/composer/services/deployment.yaml
 
 :runJava
-"%JAVA_HOME%\bin\java" %CMD_LINE_ARGS% org.ballerinalang.composer.server.launcher.ServerLauncher %CMD%
+"%BVM_HOME%\bin\java" %CMD_LINE_ARGS% org.ballerinalang.composer.server.launcher.ServerLauncher %CMD%
 if "%ERRORLEVEL%"=="121" goto runJava
 :end
 goto endlocal
