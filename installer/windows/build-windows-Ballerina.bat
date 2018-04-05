@@ -1,5 +1,10 @@
 @echo off
 
+set BALPOS=windows
+set WIXDIST=resources\wix
+set SIGNTOOLLOC="%programfiles(x86)%\Windows Kits\10\bin\10.0.16299.0\x64\signtool.exe"
+SET CERTLOC="resources\cert\wum-digicert.pfx"
+
 :argumentLoop
 IF NOT "%1"=="" (
     IF "%1"=="-dist" (
@@ -30,13 +35,6 @@ IF "%BALLERINA_VERSION%"==""  (
 	echo The syntax of the command is incorrect. Missing argument version.
 	goto EOF
 )
-
-set BALPOS=windows
-set WIXDIST=resources\wix
-
-rem set BALZIP=..\..\distribution\zip\ballerina\target\ballerina-%BALLERINA_VERSION%.zip
-rem set BALDIST=ballerina-%BALLERINA_VERSION%
-rem set BALPARCH=x64
 
 for /f %%x in ('wmic path win32_utctime get /format:list ^| findstr "="') do set %%x
 set UTC_TIME=%Year%-%Month%-%Day% %Hour%:%Minute%:%Second% UTC
@@ -101,7 +99,10 @@ echo %BALDIST% build started at '%UTC_TIME%' for %BALPOS% %BALPARCH%
 %WIXDIST%\heat dir %BALDIST% -nologo -gg -g1 -srd -sfrag -sreg -cg AppFiles -template fragment -dr INSTALLDIR -var var.SourceDir -out target\installer-resources\AppFiles.wxs
 %WIXDIST%\candle -nologo -dbalVersion=%BALLERINA_VERSION% -dWixbalVersion=1.0.0.0 -dArch=%INSTALLERPARCH% -dSourceDir=%BALDIST% -out target\installer-resources\ -ext WixUtilExtension resources\installer.wxs target\installer-resources\AppFiles.wxs
 %WIXDIST%\light -nologo -dcl:high -sice:ICE60 -ext WixUIExtension -ext WixUtilExtension -loc resources\en-us.wxl target\installer-resources\AppFiles.wixobj target\installer-resources\installer.wixobj -o target\msi\%BALDIST%-%BALPOS%-%BALPARCH%.msi
+
+%SIGNTOOLLOC% sign /f %CERTLOC% /p wuminit /t http://timestamp.verisign.com/scripts/timstamp.dll target\msi\%BALDIST%-%BALPOS%-%BALPARCH%.msi
 echo %BALDIST% build completed at '%UTC_TIME%' for %BALPOS% %BALPARCH%
+
 echo.
 goto EOF
 
