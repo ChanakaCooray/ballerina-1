@@ -51,7 +51,7 @@
         <Media Id='1' Cabinet="bal.cab" EmbedCab="yes" CompressionLevel="high"/>
         <Condition Message="Windows XP or greater required.">VersionNT >= 500</Condition>
         <MajorUpgrade AllowDowngrades="yes"/>
-        <SetDirectory Id="INSTALLDIRROOT" Value="[WindowsVolume]Ballerina"/>
+        <SetDirectory Id="INSTALLDIRROOT" Value="[$(var.ProgramFilesDir)]Ballerina"/>
         <CustomAction
                 Id="SetApplicationRootDirectory"
                 Property="ARPINSTALLLOCATION"
@@ -107,6 +107,30 @@
                             Type="string"
                             Value="[INSTALLDIR]"/>
                 </RegistryKey>
+				<RegistryKey
+                        Root="HKCR"
+                        Key=".balo\DefaultIcon"
+                        Action="createAndRemoveOnUninstall">
+                    <RegistryValue
+                            Type="string"
+                            Value="[INSTALLDIR]\icons\balo-teal.ico"/>
+                </RegistryKey>
+				<RegistryKey
+                        Root="HKCR"
+                        Key=".balx\DefaultIcon"
+                        Action="createAndRemoveOnUninstall">
+                    <RegistryValue
+                            Type="string"
+                            Value="[INSTALLDIR]\icons\balx-teal.ico"/>
+                </RegistryKey>
+				<RegistryKey
+                        Root="HKCR"
+                        Key=".bal\DefaultIcon"
+                        Action="createAndRemoveOnUninstall">
+                    <RegistryValue
+                            Type="string"
+                            Value="[INSTALLDIR]\icons\bal-teal.ico"/>
+                </RegistryKey>
                 <Environment
                         Id="BallerinaHome"
                         Action="set"
@@ -142,8 +166,8 @@
             <Custom Action="SetApplicationRootDirectory" Before="InstallFinalize"/>
         </InstallExecuteSequence>
         <!-- Include the user interface -->
-        <WixVariable Id="WixUIBannerBmp" Value="resources/Banner.jpg"/>
-        <WixVariable Id="WixUIDialogBmp" Value="resources/Dialog.jpg"/>
+        <WixVariable Id="WixUIBannerBmp" Value="resources/Banner.svg"/>
+        <WixVariable Id="WixUIDialogBmp" Value="resources/Dialog.svg"/>
         <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
     </Product>
 </Wix>
