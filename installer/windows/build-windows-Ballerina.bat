@@ -4,7 +4,7 @@ set BALPOS=windows
 set WIXDIST=resources\wix
 set ICONDIST=resources\icons
 set SIGNTOOLLOC="%programfiles(x86)%\Windows Kits\10\bin\10.0.16299.0\x64\signtool.exe"
-set CERTLOC="resources\cert\wum-digicert.pfx"
+set CERTLOC="resources\cert\ballerina-digicert.pfx"
 
 :argumentLoop
 IF NOT "%1"=="" (
@@ -44,9 +44,8 @@ IF NOT "%DIST%"=="all" IF NOT "%DIST%"=="ballerina-platform" IF NOT "%DIST%"=="b
 )
 
 IF "%BALLERINA_VERSION%"==""  (
-	set BALLERINA_VERSION=0.970.0-beta0
-	rem echo The syntax of the command is incorrect. Missing argument version.
-	rem goto EOF
+	echo The syntax of the command is incorrect. Missing argument version.
+	goto EOF
 )
 
 for /f %%x in ('wmic path win32_utctime get /format:list ^| findstr "="') do set %%x
@@ -112,7 +111,7 @@ xcopy  %ICONDIST% %BALDIST%\icons /e /i >nul 2>&1
 
 echo %BALDIST% build started at '%UTC_TIME%' for %BALPOS% %BALPARCH%
 
-echo Creating the installers...
+echo Creating the Installer...
 
 %WIXDIST%\heat dir %BALDIST% -nologo -v -gg -g1 -srd -sfrag -sreg -cg AppFiles -template fragment -dr INSTALLDIR -var var.SourceDir -out target\installer-resources\AppFiles.wxs
 %WIXDIST%\candle -nologo -sw -dbalVersion=%BALLERINA_VERSION% -dWixbalVersion=1.0.0.0 -dArch=%INSTALLERPARCH% -dSourceDir=%BALDIST% -out target\installer-resources\ -ext WixUtilExtension resources\installer.wxs target\installer-resources\AppFiles.wxs
